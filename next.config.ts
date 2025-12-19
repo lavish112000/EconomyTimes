@@ -23,10 +23,7 @@ const nextConfig: NextConfig = {
     // Optimize package imports for better performance
     optimizePackageImports: ['lucide-react', 'date-fns'],
     
-    // Turbopack configuration
-    turbo: {
-      root: process.cwd(),
-    },
+
   },
   
   // Headers for security and caching
