@@ -28,9 +28,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // Article pages
   articles.forEach((article) => {
+    const rawDate = article.updatedAt || article.publishedAt;
+    let lastModified = new Date(rawDate as string);
+    if (isNaN(lastModified.getTime())) {
+      // fallback to now if date is invalid or missing
+      lastModified = new Date();
+    }
+
     routes.push({
       url: `${SITE_CONFIG.url}/${article.categorySlug}/${article.slug}`,
-      lastModified: new Date(article.updatedAt || article.publishedAt),
+      lastModified,
       changeFrequency: 'weekly',
       priority: 0.6,
     });
