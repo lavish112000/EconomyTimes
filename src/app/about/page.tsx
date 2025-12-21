@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Target, Users, TrendingUp, Shield, Globe, BookOpen } from 'lucide-react';
 
@@ -134,12 +135,12 @@ export default function AboutPage() {
             and educational content delivered straight to your inbox. Join thousands of readers 
             who are taking control of their financial future.
           </p>
-          <a 
+          <Link 
             href="/newsletter" 
             className="inline-block mt-4 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors no-underline"
           >
             Subscribe to Newsletter
-          </a>
+          </Link>
         </section>
         
         <section className="my-12">
