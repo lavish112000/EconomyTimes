@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -8,8 +9,10 @@ import {
   DollarSign,
   Bitcoin,
   BarChart3,
+  RefreshCw,
 } from 'lucide-react';
 import { cn, formatNumber, formatPercentage } from '@/lib/utils';
+import { getMarketQuotes, getStaticMarketData } from '@/lib/market-api';
 
 interface MarketData {
   name: string;
@@ -118,119 +121,172 @@ export function MarketSnapshot({
 }
 
 // Pre-configured market snapshots
-export function IndianMarketSnapshot() {
-  const data: MarketData[] = [
-    {
-      name: 'Nifty 50',
-      value: 22145.70,
-      change: 125.30,
-      changePercent: 0.57,
-      icon: 'trending',
-    },
-    {
-      name: 'Sensex',
-      value: 73088.33,
-      change: 428.75,
-      changePercent: 0.59,
-      icon: 'trending',
-    },
-    {
-      name: 'Bank Nifty',
-      value: 47225.15,
-      change: -132.45,
-      changePercent: -0.28,
-      icon: 'chart',
-    },
-    {
-      name: 'Nifty IT',
-      value: 35890.25,
-      change: 245.80,
-      changePercent: 0.69,
-      icon: 'chart',
-    },
-  ];
+export function GlobalMarketSnapshot() {
+  const [data, setData] = useState<MarketData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  return (
-    <MarketSnapshot
-      title="Indian Markets"
-      data={data}
-      lastUpdated={new Date().toLocaleTimeString('en-IN', {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const symbols = ['SPX', 'DJI', 'IXIC', 'BTC', 'USDINR', 'GOLD'];
+      const quotes = await getMarketQuotes(symbols);
+      
+      // Fallback to static data if no quotes received
+      if (quotes.size === 0) {
+        const staticData = getStaticMarketData();
+        const fallbackData: MarketData[] = [
+          { name: 'S&P 500', value: staticData.SPX.value, change: staticData.SPX.change, changePercent: staticData.SPX.changePercent, icon: 'trending' as const },
+          { name: 'Dow Jones', value: staticData.DJI.value, change: staticData.DJI.change, changePercent: staticData.DJI.changePercent, icon: 'trending' as const },
+          { name: 'Nasdaq', value: staticData.IXIC.value, change: staticData.IXIC.change, changePercent: staticData.IXIC.changePercent, icon: 'chart' as const },
+          { name: 'Bitcoin', value: staticData.BTC.value, change: staticData.BTC.change, changePercent: staticData.BTC.changePercent, icon: 'bitcoin' as const },
+          { name: 'USD/INR', value: staticData.USDINR.value, change: staticData.USDINR.change, changePercent: staticData.USDINR.changePercent, icon: 'dollar' as const },
+          { name: 'Gold (₹/10g)', value: staticData.GOLD.value, change: staticData.GOLD.change, changePercent: staticData.GOLD.changePercent, icon: 'chart' as const },
+        ];
+        setData(fallbackData);
+      } else {
+        const symbolKeys = ['SPX', 'DJI', 'IXIC', 'BTC', 'USDINR', 'GOLD'];
+        const marketData: MarketData[] = symbolKeys.map((key, idx) => {
+          const quote = quotes.get(key);
+          const names = ['S&P 500', 'Dow Jones', 'Nasdaq', 'Bitcoin', 'USD/INR', 'Gold (₹/10g)'];
+          const icons: Array<'trending' | 'bitcoin' | 'dollar' | 'chart'> = ['trending', 'trending', 'chart', 'bitcoin', 'dollar', 'chart'];
+          return {
+            name: names[idx],
+            value: quote?.price || 0,
+            change: quote?.change || 0,
+            changePercent: quote?.changePercent || 0,
+            icon: icons[idx],
+          };
+        });
+        setData(marketData);
+      }
+      
+      setLastUpdated(new Date().toLocaleTimeString('en-IN', {
         hour: '2-digit',
         minute: '2-digit',
-      })}
-    />
+      }));
+    } catch (error) {
+      console.error('Failed to fetch market data:', error);
+      // Use static fallback data
+      const staticData = getStaticMarketData();
+      setData([
+        { name: 'S&P 500', value: staticData.SPX.value, change: staticData.SPX.change, changePercent: staticData.SPX.changePercent, icon: 'trending' as const },
+        { name: 'Dow Jones', value: staticData.DJI.value, change: staticData.DJI.change, changePercent: staticData.DJI.changePercent, icon: 'trending' as const },
+        { name: 'Nasdaq', value: staticData.IXIC.value, change: staticData.IXIC.change, changePercent: staticData.IXIC.changePercent, icon: 'chart' as const },
+        { name: 'Bitcoin', value: staticData.BTC.value, change: staticData.BTC.change, changePercent: staticData.BTC.changePercent, icon: 'bitcoin' as const },
+        { name: 'USD/INR', value: staticData.USDINR.value, change: staticData.USDINR.change, changePercent: staticData.USDINR.changePercent, icon: 'dollar' as const },
+        { name: 'Gold (₹/10g)', value: staticData.GOLD.value, change: staticData.GOLD.change, changePercent: staticData.GOLD.changePercent, icon: 'chart' as const },
+      ]);
+      setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative">
+      <MarketSnapshot
+        title="Global Markets & Commodities"
+        data={data}
+        lastUpdated={lastUpdated}
+      />
+      {loading && (
+        <div className="absolute top-4 right-4">
+          <RefreshCw className="w-4 h-4 text-muted-foreground animate-spin" />
+        </div>
+      )}
+    </div>
   );
 }
 
-export function GlobalMarketSnapshot() {
-  const data: MarketData[] = [
-    {
-      name: 'S&P 500',
-      value: 4783.45,
-      change: 22.15,
-      changePercent: 0.47,
-      icon: 'trending',
-    },
-    {
-      name: 'Dow Jones',
-      value: 37305.16,
-      change: 157.06,
-      changePercent: 0.42,
-      icon: 'trending',
-    },
-    {
-      name: 'Nasdaq',
-      value: 14813.92,
-      change: 85.28,
-      changePercent: 0.58,
-      icon: 'chart',
-    },
-    {
-      name: 'Bitcoin',
-      value: 43250.78,
-      change: -523.45,
-      changePercent: -1.20,
-      icon: 'bitcoin',
-    },
-    {
-      name: 'USD/INR',
-      value: 83.15,
-      change: 0.05,
-      changePercent: 0.06,
-      icon: 'dollar',
-    },
-    {
-      name: 'Gold (₹/10g)',
-      value: 62475,
-      change: 125,
-      changePercent: 0.20,
-      icon: 'chart',
-    },
-    {
-      name: 'Crude Oil ($)',
-      value: 78.45,
-      change: -1.25,
-      changePercent: -1.57,
-      icon: 'chart',
-    },
-    {
-      name: 'FTSE 100',
-      value: 7631.15,
-      change: 18.45,
-      changePercent: 0.24,
-      icon: 'trending',
-    },
-  ];
+export function IndianMarketSnapshot() {
+  const [data, setData] = useState<MarketData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  return (
-    <MarketSnapshot
-      title="Global Markets & Commodities"
-      data={data}
-      lastUpdated={new Date().toLocaleTimeString('en-IN', {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const symbols = ['NIFTY50', 'SENSEX', 'BANKNIFTY', 'NIFTYIT'];
+      const quotes = await getMarketQuotes(symbols);
+      
+      if (quotes.size === 0) {
+        const staticData = getStaticMarketData();
+        const fallbackData: MarketData[] = [
+          { name: 'Nifty 50', value: staticData.NIFTY50.value, change: staticData.NIFTY50.change, changePercent: staticData.NIFTY50.changePercent, icon: 'trending' as const },
+          { name: 'Sensex', value: staticData.SENSEX.value, change: staticData.SENSEX.change, changePercent: staticData.SENSEX.changePercent, icon: 'trending' as const },
+          { name: 'Bank Nifty', value: staticData.BANKNIFTY.value, change: staticData.BANKNIFTY.change, changePercent: staticData.BANKNIFTY.changePercent, icon: 'chart' as const },
+          { name: 'Nifty IT', value: staticData.NIFTYIT.value, change: staticData.NIFTYIT.change, changePercent: staticData.NIFTYIT.changePercent, icon: 'chart' as const },
+        ];
+        setData(fallbackData);
+      } else {
+        const symbolKeys = ['NIFTY50', 'SENSEX', 'BANKNIFTY', 'NIFTYIT'];
+        const marketData: MarketData[] = symbolKeys.map((key, idx) => {
+          const quote = quotes.get(key);
+          const names = ['Nifty 50', 'Sensex', 'Bank Nifty', 'Nifty IT'];
+          const icons: Array<'trending' | 'chart'> = ['trending', 'trending', 'chart', 'chart'];
+          return {
+            name: names[idx],
+            value: quote?.price || 0,
+            change: quote?.change || 0,
+            changePercent: quote?.changePercent || 0,
+            icon: icons[idx],
+          };
+        });
+        setData(marketData);
+      }
+      
+      setLastUpdated(new Date().toLocaleTimeString('en-IN', {
         hour: '2-digit',
         minute: '2-digit',
-      })}
-    />
+      }));
+    } catch (error) {
+      console.error('Failed to fetch market data:', error);
+      const staticData = getStaticMarketData();
+      setData([
+        { name: 'Nifty 50', value: staticData.NIFTY50.value, change: staticData.NIFTY50.change, changePercent: staticData.NIFTY50.changePercent, icon: 'trending' as const },
+        { name: 'Sensex', value: staticData.SENSEX.value, change: staticData.SENSEX.change, changePercent: staticData.SENSEX.changePercent, icon: 'trending' as const },
+        { name: 'Bank Nifty', value: staticData.BANKNIFTY.value, change: staticData.BANKNIFTY.change, changePercent: staticData.BANKNIFTY.changePercent, icon: 'chart' as const },
+        { name: 'Nifty IT', value: staticData.NIFTYIT.value, change: staticData.NIFTYIT.change, changePercent: staticData.NIFTYIT.changePercent, icon: 'chart' as const },
+      ]);
+      setLastUpdated(new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative">
+      <MarketSnapshot
+        title="Indian Markets"
+        data={data}
+        lastUpdated={lastUpdated}
+      />
+      {loading && (
+        <div className="absolute top-4 right-4">
+          <RefreshCw className="w-4 h-4 text-muted-foreground animate-spin" />
+        </div>
+      )}
+    </div>
   );
 }
 
