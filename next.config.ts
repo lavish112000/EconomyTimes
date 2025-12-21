@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // React Compiler
   reactCompiler: true,
+
+  // Disable typed routes generation (prevents .next/dev/types/routes.d.ts TypeScript failures)
+  typedRoutes: false,
   
   // Image optimization
   images: {
