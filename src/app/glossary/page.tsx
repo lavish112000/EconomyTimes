@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Search } from 'lucide-react';
 
@@ -236,12 +237,12 @@ export default function GlossaryPage() {
           <p className="text-muted-foreground mb-6">
             We&apos;re constantly expanding our glossary. Let us know what terms you&apos;d like to see defined!
           </p>
-          <a
+          <Link
             href="/about"
             className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
           >
             Contact Us
-          </a>
+          </Link>
         </div>
         
         {/* Disclaimer */}
