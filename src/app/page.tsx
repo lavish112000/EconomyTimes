@@ -146,14 +146,14 @@ export default function HomePage() {
           />
         </div>
         
-        <div className="absolute inset-0 bg-gradient-to-t from-finance-navy-900/90 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-finance-navy-900/90 to-transparent pointer-events-none" />
         
-        <div className="container mx-auto px-4 lg:px-8 py-20 md:py-28 relative">
+        <div className="container mx-auto px-4 lg:px-8 py-20 md:py-28 relative pointer-events-none">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl"
+            className="max-w-3xl pointer-events-auto"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-finance-emerald-500/20 text-finance-emerald-400 rounded-full text-sm font-medium mb-6">
               <TrendingUp className="w-4 h-4" />
@@ -191,7 +191,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 pointer-events-auto"
           >
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10">
               <p className="text-3xl font-bold text-finance-emerald-400">50+</p>
