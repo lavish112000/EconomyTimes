@@ -12,6 +12,9 @@ import { EconomyDashboard } from '@/components/economy/economy-dashboard';
 import { EconomicTimeline } from '@/components/economy/economic-timeline';
 import { PersonalFinanceDashboard } from '@/components/personal-finance/personal-finance-dashboard';
 import { FinancialRoadmap } from '@/components/personal-finance/financial-roadmap';
+import { StockMarketDashboard } from '@/components/investing/stock-market-dashboard';
+import { PortfolioAllocation } from '@/components/investing/portfolio-allocation';
+import { ComparisonTable } from '@/components/investing/comparison-table';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -91,6 +94,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <div className="mt-12">
             <FinancialRoadmap />
           </div>
+        </section>
+      )}
+
+      {(categorySlug === 'investing' || categorySlug === 'stock-market') && (
+        <section className="container mx-auto px-4 lg:px-8 py-8 -mt-8 relative z-10">
+          <StockMarketDashboard />
+          {categorySlug === 'investing' && (
+            <div className="grid md:grid-cols-2 gap-8 mt-12">
+              <PortfolioAllocation />
+              <ComparisonTable />
+            </div>
+          )}
         </section>
       )}
 
