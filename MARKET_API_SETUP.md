@@ -15,7 +15,8 @@ Your finance website now fetches real-time Indian and global market data!
 
 ### 1. Get Your Free API Key
 
-Visit: https://www.alphavantage.co/support/#api-key
+Visit: <https://www.alphavantage.co/support/#api-key>
+
 - Enter your email
 - Get instant API key (free tier: 5 calls/min, 500 calls/day)
 
@@ -37,6 +38,7 @@ NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY=YOUR_ACTUAL_API_KEY_HERE
 ### 3. That's it!
 
 The market widgets will now:
+
 - Try Alpha Vantage first (if key is configured)
 - Fallback to Yahoo Finance API via `/api/market-data`
 - Show static educational data if both fail
@@ -66,11 +68,13 @@ src/
 ## 💡 API Usage Tips
 
 **Free Tier Limits:**
+
 - Alpha Vantage: 5 calls/min, 500/day
 - Our caching: 5 min TTL per symbol
 - With 10 symbols + 5min cache = ~96 API calls/day ✅
 
 **To reduce API usage further:**
+
 - Increase cache TTL in `market-api.ts` (CACHE_TTL)
 - Decrease refresh interval in market-snapshot components
 - Use static data for development
@@ -78,10 +82,12 @@ src/
 ## 🚦 Testing
 
 **Without API key:**
+
 - Falls back to Yahoo Finance → Static data
 - Everything works, just shows placeholder values
 
 **With API key:**
+
 - Run `npm run dev`
 - Visit homepage
 - Watch the loading spinner
