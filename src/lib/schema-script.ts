@@ -12,7 +12,6 @@ export function SchemaScript({ schema }: SchemaScriptProps) {
     null,
     schemas.map((s, index) =>
       React.createElement('script', {
-        // eslint-disable-next-line react/no-array-index-key
         key: index,
         type: 'application/ld+json',
         dangerouslySetInnerHTML: { __html: s },
