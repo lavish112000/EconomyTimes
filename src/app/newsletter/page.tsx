@@ -37,7 +37,7 @@ const BENEFITS = [
 
 export default function NewsletterPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-12 md:py-16">
       <Breadcrumbs
         items={[
           { name: 'Home', href: '/' },
