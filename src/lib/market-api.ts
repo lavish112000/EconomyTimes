@@ -46,7 +46,9 @@ async function fetchFromAlphaVantage(symbol: string): Promise<MarketQuote | null
     if (!symbolData) return null;
 
     const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbolData.alpha}&apikey=${ALPHA_VANTAGE_KEY}`;
-    const response = await fetch(url, { next: { revalidate: 300 } }); // 5min cache
+    // Note: Direct client-side fetch to Alpha Vantage often fails due to CORS or rate limits.
+    // This is expected, and we will fall back to the internal API.
+    const response = await fetch(url); 
     
     if (!response.ok) return null;
     
@@ -63,7 +65,8 @@ async function fetchFromAlphaVantage(symbol: string): Promise<MarketQuote | null
       timestamp: Date.now(),
     };
   } catch (error) {
-    console.error(`Alpha Vantage error for ${symbol}:`, error);
+    // Log as warning instead of error since fallback is available
+    console.warn(`Alpha Vantage fetch failed for ${symbol} (using fallback):`, error);
     return null;
   }
 }
@@ -79,7 +82,7 @@ async function fetchFromYahoo(symbol: string): Promise<MarketQuote | null> {
     // Using a CORS proxy for client-side requests (for demo purposes)
     // In production, use your own backend API route
     const url = `/api/market-data?symbol=${symbolData.yahoo}`;
-    const response = await fetch(url, { next: { revalidate: 300 } });
+    const response = await fetch(url);
     
     if (!response.ok) return null;
     
