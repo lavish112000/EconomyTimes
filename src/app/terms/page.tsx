@@ -35,7 +35,7 @@ export default function TermsOfUsePage() {
 
         <h2>3. Disclaimer of Warranties</h2>
         <p>
-          The information on this website is provided "as is" without any representations or warranties, express or implied. FinanceHub makes no representations or warranties in relation to the accuracy or completeness of the information found on this website.
+          The information on this website is provided &quot;as is&quot; without any representations or warranties, express or implied. FinanceHub makes no representations or warranties in relation to the accuracy or completeness of the information found on this website.
         </p>
 
         <h2>4. Limitation of Liability</h2>
