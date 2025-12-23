@@ -44,7 +44,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
   
   // Static pages
-  const staticPages = ['about', 'newsletter', 'glossary'];
+  const staticPages = [
+    'about', 
+    'contact', 
+    'newsletter', 
+    'glossary', 
+    'tools',
+    'disclaimer',
+    'privacy-policy',
+    'cookie-policy',
+    'terms'
+  ];
   staticPages.forEach((page) => {
     routes.push({
       url: `${SITE_CONFIG.url}/${page}`,
