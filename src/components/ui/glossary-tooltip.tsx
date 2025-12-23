@@ -4,19 +4,20 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { GLOSSARY_TERMS } from '@/lib/glossary-data';
 
 interface GlossaryTooltipProps {
   term: string;
-  definition: string;
+  definition?: string;
   example?: string;
   learnMoreUrl?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
 export function GlossaryTooltip({
   term,
-  definition,
+  definition: propDefinition,
   example,
   learnMoreUrl = '/glossary',
   children,
@@ -26,6 +27,17 @@ export function GlossaryTooltip({
   const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
   const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Find definition if not provided
+  let definition = propDefinition;
+  if (!definition) {
+    const foundTerm = GLOSSARY_TERMS.flatMap(g => g.terms).find(t => t.term.toLowerCase() === term.toLowerCase() || t.term.toLowerCase().includes(term.toLowerCase()));
+    if (foundTerm) {
+      definition = foundTerm.definition;
+    } else {
+      definition = "Definition not found.";
+    }
+  }
 
   useEffect(() => {
     if (isOpen && triggerRef.current) {
@@ -56,7 +68,7 @@ export function GlossaryTooltip({
           className
         )}
       >
-        {children}
+        {children || term}
       </span>
 
       <AnimatePresence>
@@ -120,46 +132,3 @@ export function GlossaryTooltip({
   );
 }
 
-// Pre-defined glossary terms for common finance concepts
-export const GLOSSARY_TERMS = {
-  gdp: {
-    term: 'GDP (Gross Domestic Product)',
-    definition: 'The total monetary value of all finished goods and services produced within a country during a specific time period.',
-    example: 'India\'s GDP in 2024 is approximately $3.7 trillion, making it the 5th largest economy.',
-  },
-  inflation: {
-    term: 'Inflation',
-    definition: 'The rate at which the general level of prices for goods and services rises, eroding purchasing power.',
-    example: 'If inflation is 5%, an item costing ₹100 today will cost ₹105 next year.',
-  },
-  equity: {
-    term: 'Equity',
-    definition: 'Ownership interest in a company, typically in the form of stocks or shares.',
-    example: 'Buying 100 shares of Reliance Industries means you own a small equity stake in the company.',
-  },
-  bond: {
-    term: 'Bond',
-    definition: 'A fixed-income instrument representing a loan made by an investor to a borrower.',
-    example: 'A 10-year government bond pays you fixed interest every year and returns your principal at maturity.',
-  },
-  dividend: {
-    term: 'Dividend',
-    definition: 'A portion of a company\'s earnings distributed to shareholders.',
-    example: 'If a company declares a ₹5 dividend and you own 100 shares, you receive ₹500.',
-  },
-  pe_ratio: {
-    term: 'P/E Ratio',
-    definition: 'Price-to-Earnings ratio - a valuation metric comparing stock price to earnings per share.',
-    example: 'A stock trading at ₹100 with EPS of ₹5 has a P/E ratio of 20.',
-  },
-  mutual_fund: {
-    term: 'Mutual Fund',
-    definition: 'An investment vehicle that pools money from multiple investors to purchase a diversified portfolio.',
-    example: 'A mutual fund might invest your ₹10,000 across 50 different stocks and bonds.',
-  },
-  sip: {
-    term: 'SIP (Systematic Investment Plan)',
-    definition: 'A method of investing fixed amounts regularly in mutual funds.',
-    example: 'Investing ₹5,000 every month in a mutual fund through SIP.',
-  },
-};
