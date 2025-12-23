@@ -1,4 +1,3 @@
-import type { Article } from '@/types';
 import React from 'react';
 
 interface ArticleSchemaProps {
